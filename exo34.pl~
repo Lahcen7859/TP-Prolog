@@ -1,0 +1,22 @@
+
+substituer(PL, X, Y, L, LR) :-
+
+    % Nombre de lignes de la matrice
+    length(L, NbLignes),
+
+    % Conversion : ligne depuis le haut
+    LigneHaut is NbLignes - Y + 1,
+
+    % Appel du prédicat auxiliaire pour remplacer dans la bonne ligne
+    remplacer_ligne(LigneHaut, X, PL, L, LR).
+
+% Cas où on est sur la bonne ligne
+remplacer_ligne(1, Colonne, Valeur, [Ligne | Reste], [NouvelleLigne | Reste]) :-
+    % On utilise le predicat de l'exo prec placer pour modifier la ligne
+    placer(Valeur, Colonne, Ligne, NouvelleLigne), !.
+
+% Cas général : on avance dans la matrice
+remplacer_ligne(N, Colonne, Valeur, [L | Q], [L | Q2]) :-
+    N > 1,
+    N1 is N - 1,
+    remplacer_ligne(N1, Colonne, Valeur, Q, Q2).

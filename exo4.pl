@@ -1,0 +1,69 @@
+
+:- use_module(library(clpfd)).
+
+% Définition de la somme magique S pour un ordre N
+somme_magique(N, S) :-
+    S is N * (N*N + 1) / 2.
+
+% Prédicat principal pour trouver un carré diabolique d'ordre N
+diabolique(N, Carré) :-
+    % Calculer la taille de la liste plate (N^2)
+    M is N * N,
+
+    % Créer une liste plate de M variables (les cellules)
+    length(Carré, M),
+
+    % Calculer la Somme Magique S (par exemple S=34 pour N=4)
+    somme_magique(N, S),
+
+    % 1. Définir le domaine : les entiers de 1 à M
+    Carré ins 1..M,
+
+    % 2. Contrainte d'unicité : tous les éléments doivent être différents
+    all_different(Carré),
+
+    % 3. On convertit la liste plate en une matrice L x L pour faciliter les contraintes
+    % Pour N=4, on peut faire le découpage "manuellement" pour la simplicité
+    ( N = 4 ->
+        % Découper le carré 4x4
+        Carré = [A1,A2,A3,A4, B1,B2,B3,B4, C1,C2,C3,C4, D1,D2,D3,D4],
+        Lignes = [[A1,A2,A3,A4], [B1,B2,B3,B4], [C1,C2,C3,C4], [D1,D2,D3,D4]],
+
+        % Contraintes de sommation : Lignes et Colonnes
+        maplist(sum_to_s(S), Lignes), % Somme des lignes
+
+        Cols = [[A1,B1,C1,D1], [A2,B2,C2,D2], [A3,B3,C3,D3], [A4,B4,C4,D4]],
+        maplist(sum_to_s(S), Cols), % Somme des colonnes
+
+        % Contraintes de Diagonales (simples)
+        Diagonale_P = [A1, B2, C3, D4],
+        Diagonale_A = [A4, B3, C2, D1],
+        sum(Diagonale_P, #=, S),
+        sum(Diagonale_A, #=, S),
+
+        % Contraintes de Diagonales Modulo N (Co-diagonales)
+        % C'est l'étape qui rend le carré "diabolique"
+        % Par exemple, pour N=4 (A2, B3, C4, D1), (A3, B4, C1, D2), etc.
+        sum([A2, B3, C4, D1], #=, S),
+        sum([A3, B4, C1, D2], #=, S),
+        sum([A4, B1, C2, D3], #=, S),
+        sum([A1, B4, C3, D2], #=, S),
+        sum([A4, B3, C2, D1], #=, S), % déjà fait, mais pour les 4x4 c'est la principale.
+        sum([A3, B2, C1, D4], #=, S),
+        sum([A2, B1, C4, D3], #=, S)
+    ;
+        % Gestion des autres N (non implémenté ici pour rester simple)
+        format('N=~w non supporté dans cet exemple simple.~n', [N]),
+        fail
+    ),
+
+    % 4. Lancement de la recherche de solution (étiquetage)
+    labeling([ff], Carré).
+
+affiche([]).
+affiche([L|R]) :- writeln(L), affiche(R).
+
+
+% Prédicat auxiliaire pour que la somme d'une liste soit S
+sum_to_s(S, Liste) :-
+    sum(Liste, #=, S).

@@ -1,0 +1,6 @@
+creer_magique(N, L) :-
+    length(L, N),               % L est une liste de N éléments
+    maplist(meme_length(L), L), % Chaque élément de L est une liste de N éléments
+    maplist(maplist(=(0)), L). % Chaque élément de chaque sous-liste est 0
+
+

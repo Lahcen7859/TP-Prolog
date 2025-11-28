@@ -1,0 +1,7 @@
+ecrire([]). % Cas de base : si la liste est vide, on ne fait rien.
+
+ecrire([Ligne | Reste]) :-
+
+    write(Ligne), % On affiche la ligne
+    nl, % On passe à la ligne suivante
+    ecrire(Reste). % On repète le processus pour le reste de la matrice
